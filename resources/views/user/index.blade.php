@@ -21,6 +21,7 @@
 				<table class="table table-stripped table-bordered">
 				<thead class="bg-primary text-white">
 					<th>No</th>
+					<th>profile</th>
 					<th>Email</th>
 					<th>Name</th>
 					<th>Address</th>
@@ -34,6 +35,9 @@
 					@foreach($users as $key => $user)
 					<tr>
 						<td>{{ $key +1 }}</td>
+						<td>
+							<img src="{{ $user->profile ? URL::to('storage/user/images/'. $user->profile) : asset('images/default.png') }}" height="70" alt="">
+						</td>
 						<td>{{ $user->email }}</td>
 						<td>{{ $user->name }}</td>
 						<td>{{ $user->address }}</td>

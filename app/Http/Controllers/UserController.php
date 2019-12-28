@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\user;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+use Storage;
 
 class UserController extends Controller
 {
@@ -40,9 +42,18 @@ class UserController extends Controller
 			'hobby' => 'required|string',
 			'phone' => 'required|string',
 			'password' => 'required|string|confirmed',
+			'profile' => 'required|file|image'
 		]);
-		
-		User::create($request->all());
+		$file =  $request->file('profile');
+
+		$filename = sha1($file->getClientoriginalName() . Carbon::now() . mt_rand()). '.'.$file->getClientoriginalExtension();
+		$user = (object) $request->all();
+		$file->storeAs('public/user/images', $filename);
+		$user->profile = $filename;
+		$user->password = bcrypt($request->password);
+	
+		User::create((array) $user);
+
 
 		return redirect()->route('user.index')->with('success', 'Successfuly create new user');
 	}
@@ -71,6 +82,23 @@ class UserController extends Controller
 			'phone' => 'required|string'
 		]);
 
+		if($request->profile) {
+			$request->validate(['profile' => 'required|file|image']);
+
+			$file =  $request->file('profile');
+			$filename = sha1($file->getClientoriginalName() . Carbon::now() . mt_rand()). '.'.$file->getClientoriginalExtension();
+		
+			$file->storeAs('public/user/images',$filename);
+
+			$path = 'public/user/images/'.$user->profile;
+
+			if(Storage::exists($path)) {
+				Storage::delete($path);
+			}
+
+			$user->profile = $filename;
+		}
+
 		if($request->password) {
 			$request->validate( ['password' => 'required|string|confirmed'] );
 			$user->password = bcrypt($request->password);
@@ -90,6 +118,13 @@ class UserController extends Controller
 
 	public function delete(Request $request){
 		$user = User::findOrFail($request->id);
+		
+		$path = 'public/user/images/'.$user->profile;
+
+		if(Storage::exists($path)) {
+			Storage::delete($path);
+		}
+
 		$user->delete();
 		return redirect()->route('user.index')->withSuccess('Successfuly Deleting User');
 	}
