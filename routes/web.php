@@ -24,5 +24,9 @@ Route::prefix('/user')->name('user.')->group(function() {
 		Route::get('/','UserController@index')->name('index');
 		Route::get('/create', 'UserController@create')->name('create');
 		Route::post('/create', 'UserController@store')->name('store');
+
+		Route::get('/user/{id}', 'UserController@edit')->name('edit');
+		Route::put('/update', 'UserController@update')->name('update');
+		Route::delete('/delete', 'UserController@delete')->name('delete');
 	});
 

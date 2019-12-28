@@ -28,11 +28,12 @@
 					<th>Born</th>
 					<th>Age</th>
 					<th>Hobby</th>
+					<th>Action</th>
 				</thead>
 				<tbody>
 					@foreach($users as $key => $user)
 					<tr>
-						<td>{{ $key + 1 }}</td>
+						<td>{{ $key +1 }}</td>
 						<td>{{ $user->email }}</td>
 						<td>{{ $user->name }}</td>
 						<td>{{ $user->address }}</td>
@@ -40,10 +41,21 @@
 						<td>{{ $user->born }}</td>
 						<td>{{ \Carbon\Carbon::parse($user->born)->diffForHumans(null, true) }}</td>
 						<td>{{ $user->hobby }}</td>
+						<td>
+							<a href="{{ route('user.edit', $user->id) }}" class="btn btn-primary btn-sm text-white">Edit</a>
+							<form method="POST" action=" {{ route('user.delete') }}" class="floa-left">
+								@csrf
+								{{ method_field('DELETE') }}
+								<input type="hidden" name="id" value="{{ $user->id }}">
+								<button type="submit" class="btn btn-danger btn-sm text-white">Delete</button>
+							</form>
+
+						</td>
 					</tr>
 					@endforeach
 				</tbody>
 				</table>
+				{{ $users->links() }}
 			</div>
 		</div>
 	</div>
